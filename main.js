@@ -64,7 +64,7 @@ const refreshToken = async () => {
 }
 
 const autoRefreshToken = () => refreshToken().then(expr =>
-  setTimeout(() => autoRefreshToken, (expr - 30) * 1000)
+  setTimeout(autoRefreshToken, (expr - 30) * 1000)
 )
 
 airgram.api.setBio({ bio: '' })
