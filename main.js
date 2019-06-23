@@ -36,11 +36,24 @@ auth.use({
 })
 
 const updateTrack = async () => {
-  const { id, name, artists } = await spotify.getMyCurrentPlaybackState().then(r => r.body.item)
+  const { item, is_playing: playing } = (await spotify.getMyCurrentPlaybackState()).body
+  if (!item) {
+    if (trackId !== null) {
+      airgram.api.setBio({ bio: '' })
+      trackId = null
+    }
+    return
+  }
+  const { id, name, artists } = item
   if (trackId === id) return
+  if (!playing) {
+    airgram.api.setBio({ bio: '' })
+    trackId = null
+    return
+  }
   const trackFrom = artists.map(({ name }) => name).join(' & ')
   const bio = `Now listining to ${trackFrom} - ${name}`
-  airgram.api.setBio({ bio }).catch(console.error)
+  airgram.api.setBio({ bio })
   trackId = id
 }
 
