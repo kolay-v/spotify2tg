@@ -4,7 +4,8 @@ const Spotify = require('spotify-web-api-node')
 const token = require('./token.json')
 const {
   CLIENT_SECRET,
-  CLIENT_ID
+  CLIENT_ID,
+  DEFAULT_BIO
 } = process.env
 
 const spotify = new Spotify({
@@ -39,7 +40,7 @@ const updateTrack = async () => {
   const { item, is_playing: playing } = (await spotify.getMyCurrentPlaybackState()).body
   if (!item) {
     if (trackId !== null) {
-      airgram.api.setBio({ bio: '' })
+      airgram.api.setBio({ bio: DEFAULT_BIO })
       trackId = null
     }
     return
@@ -47,7 +48,7 @@ const updateTrack = async () => {
   const { id, name, artists } = item
   if (trackId === id) return
   if (!playing) {
-    airgram.api.setBio({ bio: '' })
+    airgram.api.setBio({ bio: DEFAULT_BIO })
     trackId = null
     return
   }
@@ -67,7 +68,7 @@ const autoRefreshToken = () => refreshToken().then(expr =>
   setTimeout(autoRefreshToken, (expr - 30) * 1000)
 )
 
-airgram.api.setBio({ bio: '' })
+airgram.api.setBio({ bio: DEFAULT_BIO })
   .then(autoRefreshToken)
   .then(() => setInterval(updateTrack, 2000))
   .catch(console.error)
